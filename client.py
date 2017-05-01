@@ -26,6 +26,7 @@ from cocos.sprite import Sprite
 from cocos.actions import *
 from cocos.director import director
 
+from pyglet.window import key
 from pyglet.window.key import symbol_string
 
 from twisted.protocols import basic
@@ -41,12 +42,16 @@ WINDOW_WIDTH = 700;
 WINDOW_HEIGHT = 500;
 OFFSET = 60
 SPEED = 200
+color = (52, 152, 219)
 
 SPRITE_POS = '';
+keys = ''
+score = 0
+it_count = 0
 
 act = ''
 connection = ''
-num_spaghetti = 5
+num_spaghetti = 10
 
 IDENTIFIER = 0
 
@@ -61,8 +66,23 @@ class MoveGrossini(Move):
 
 class MoveSpaghetti(Move):
     def step(self, dt):
-        self.target.velocity = (1, 2)
+        global SPRITE_POS
+        global score
+        pos = self.target.position
+        
+        #Collision Detection
+        if SPRITE_POS[0] > pos[0] - 10 and SPRITE_POS[0] < pos[0] + 10 and SPRITE_POS[1] > pos[1] - 10 and SPRITE_POS[1] < pos[1] + 10:
+            print('COLLISION!')
+            score = score + 1
+            self.target.position = random.randint(10, WINDOW_WIDTH - 10), random.randint(-500, -20)
+
+        #Off Screen Detection
+        if pos[1] >  WINDOW_HEIGHT:
+            self.target.position = random.randint(10, WINDOW_WIDTH - 10), -20
+        
+        self.target.velocity = (1, 20)
         super(MoveSpaghetti, self).step(dt)
+
 
 
 class Actions(ColorLayer):
@@ -73,7 +93,7 @@ class Actions(ColorLayer):
     def __init__(self):
         super(Actions, self).__init__(52, 152, 219, 1000)
 
-        self.sprite = Sprite('grossini.png')
+        self.sprite = Sprite('sub1.png')
         self.sprite.position = OFFSET, WINDOW_HEIGHT - OFFSET
         self.sprite.velocity = 0, 0
         self.add(self.sprite)
@@ -86,21 +106,48 @@ class Actions(ColorLayer):
         self.sprite_vector[IDENTIFIER] = self.sprite
     
         self.sprite.do(MoveGrossini())
+        #set up key handling
         
-
-    def on_key_press(self, key, modifiers):
+        
+    def on_key_press(self, keyPress, modifiers):
         global SPEED
         global IDENTIFIER
         global connection
-
-        if symbol_string(key) == "EQUAL":
+        global keys
+        self.update_color()
+        
+        if symbol_string(keyPress) == "D":
             new_pos = [self.sprite.position[0] + 10, self.sprite.position[1]]
             self.sprite.position = tuple(new_pos)
             self.ping()
-        elif symbol_string(key) == "MINUS":
+        elif symbol_string(keyPress) == "A":
             new_pos = [self.sprite.position[0] - 10, self.sprite.position[1]]
             self.sprite.position = tuple(new_pos)
             self.ping()
+        elif symbol_string(keyPress) == "S":
+            new_pos = [self.sprite.position[0], self.sprite.position[1] - 10]
+            self.sprite.position = tuple(new_pos)
+            self.ping()
+        elif symbol_string(keyPress) == "W":
+            new_pos = [self.sprite.position[0], self.sprite.position[1] + 10]
+            self.sprite.position = tuple(new_pos)
+            self.ping()
+    
+    def update_color(self):
+        '''updates global variable for color and also self.color'''
+        global color
+        r = color[0] - .333
+        g = color[1] - 1
+        b = color[2] 
+        if r < 0: r = 0
+        if g < 0: g = 0
+        if b < 0: b = 0
+        if r > 255: r = 255
+        if g > 255: g = 255
+        if b > 255: b = 255
+        color = (r, g, b)
+        self.color = color
+        print(score)
             
 
     def echo(self):
@@ -109,15 +156,17 @@ class Actions(ColorLayer):
     def make_spaghetti(self):
         print('\ntryna cook up some spaghetti\n')
         for i in range(num_spaghetti):
+            random.seed()
             self.new_sprite = Sprite('spaghetti.png')
-            self.new_sprite.position = (WINDOW_WIDTH*(i+1)/(num_spaghetti+1)), 100
+            self.new_sprite.position = random.randint(10, WINDOW_WIDTH - 10), random.randint(-500, -20)
+            self.new_sprite.velocity = random.randint(-30, 30), random.randint(20, 40)
             self.new_sprite.do(MoveSpaghetti())
             self.add(self.new_sprite)
             self.spaghetti.append(self.new_sprite)
 
 
     def add_sprite(self, num):
-        sprite_add = Sprite('grossini.png')
+        sprite_add = Sprite('sub2.png')
         sprite_add.position = 100, 100
         self.add(sprite_add)
         self.sprite_vector[num] = sprite_add
@@ -203,8 +252,11 @@ class EchoFactory(protocol.ClientFactory):
 # this connects the protocol to a server runing on port 8000
 def main():
     global act
+    global keys
 
     director.init(width=WINDOW_WIDTH, height=WINDOW_HEIGHT)
+    keys = key.KeyStateHandler()
+    cocos.director.director.window.push_handlers(keys)
     act = Actions()
     main_scene = cocos.scene.Scene(act)
 
