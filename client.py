@@ -46,6 +46,7 @@ SPRITE_POS = '';
 
 act = ''
 connection = ''
+num_spaghetti = 5
 
 IDENTIFIER = 0
 
@@ -57,6 +58,12 @@ class MoveGrossini(Move):
 
         super(MoveGrossini, self).step(dt)
         SPRITE_POS = self.target.position
+
+class MoveSpaghetti(Move):
+    def step(self, dt):
+        self.target.velocity = (1, 2)
+        super(MoveSpaghetti, self).step(dt)
+
 
 class Actions(ColorLayer):
     is_event_handler = True
@@ -70,6 +77,8 @@ class Actions(ColorLayer):
         self.sprite.position = OFFSET, WINDOW_HEIGHT - OFFSET
         self.sprite.velocity = 0, 0
         self.add(self.sprite)
+        self.spaghetti = []
+        self.make_spaghetti()
         
         self.sprite_vector.append(self.sprite)
         self.sprite_vector.append(self.sprite)
@@ -77,6 +86,7 @@ class Actions(ColorLayer):
         self.sprite_vector[IDENTIFIER] = self.sprite
     
         self.sprite.do(MoveGrossini())
+        
 
     def on_key_press(self, key, modifiers):
         global SPEED
@@ -95,6 +105,16 @@ class Actions(ColorLayer):
 
     def echo(self):
         print('Hello')
+
+    def make_spaghetti(self):
+        print('\ntryna cook up some spaghetti\n')
+        for i in range(num_spaghetti):
+            self.new_sprite = Sprite('spaghetti.png')
+            self.new_sprite.position = (WINDOW_WIDTH*(i+1)/(num_spaghetti+1)), 100
+            self.new_sprite.do(MoveSpaghetti())
+            self.add(self.new_sprite)
+            self.spaghetti.append(self.new_sprite)
+
 
     def add_sprite(self, num):
         sprite_add = Sprite('grossini.png')
