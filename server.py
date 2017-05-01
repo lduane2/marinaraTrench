@@ -61,6 +61,7 @@ def main():
     f = Factory()
     f.protocol = ChatClient
     f.clients = []
+    print('Listening on 1025...')
     reactor.listenTCP(1025, f)
     reactor.run()
 
