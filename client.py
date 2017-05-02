@@ -351,7 +351,7 @@ def main():
     director._set_scene(main_scene)   
 
     f = EchoFactory()
-    reactor.connectTCP("localhost", 1025, f)
+    reactor.connectTCP(sys.argv[1], int(sys.argv[2]), f)
     reactor.run()
 
 # this only runs if the module was *not* imported
