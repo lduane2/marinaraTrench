@@ -74,26 +74,37 @@ class MoveSubmarine(Move):
             new_pos = [self.target.position[0] + 3, self.target.position[1]]
             if new_pos[0] < WINDOW_WIDTH:
                 self.target.position = tuple(new_pos)
-            self.ping()
-
+            try:
+                self.ping()
+            except:
+                pass
         if keys[key.LEFT]:
             print ("LEFT")
             new_pos = [self.target.position[0] - 3, self.target.position[1]]
             if new_pos[0] > 0:
                 self.target.position = tuple(new_pos)
-            self.ping()
+            try:
+                self.ping()
+            except:
+                pass
 	if keys[key.UP]:
             print ("UP")
             new_pos = [self.target.position[0], self.target.position[1] + 3]
             if new_pos[1] < WINDOW_HEIGHT:
                 self.target.position = tuple(new_pos)	
-            self.ping()
+            try:
+                self.ping()
+            except:
+                pass
         if keys[key.DOWN]:
             print ("DOWN")
             new_pos = [self.target.position[0], self.target.position[1] - 3]
             if new_pos[1] > 0:
                 self.target.position = tuple(new_pos)
-	    self.ping()
+            try:
+	        self.ping()
+            except:
+                pass
 	#print (self.target.sprite_data)
 
 
@@ -170,9 +181,18 @@ class Actions(ColorLayer):
         self.add(self.label)
 
         #Score labels
-        self.scores = cocos.text.Label('P1: {}\tP2: {}'.format(p1_score, p2_score),font_name='Comic Sans', font_size=12, anchor_x='center', anchor_y='center')
+        self.scores = cocos.text.Label('P1: {}    P2: {}'.format(p1_score, p2_score),font_name='Comic Sans', font_size=12, anchor_x='center', anchor_y='center')
         self.scores.position = 50, WINDOW_HEIGHT - 20
         self.add(self.scores)
+
+        #player labels
+        self.p1_label = cocos.text.Label('P1', font_name='Comic Sans', font_size=10)
+        self.p1_label.position = SPRITE_POS[0], SPRITE_POS[1] + 100
+        self.add(self.p1_label)
+
+        self.p2_label = cocos.text.Label('P2', font_name='Comic Sans', font_size=10)
+        self.p2_label.position = SPRITE_POS[0], SPRITE_POS[1] + 100
+        self.add(self.p2_label)
 
         self.updateLoop = LoopingCall(self.update_client)
         self.updateLoop.start(1.0)

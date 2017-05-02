@@ -83,6 +83,8 @@ class ChatClient(basic.LineReceiver):
                 if p2_pos[0] > spa_pos[0] - 31 and p2_pos[0] < spa_pos[0] + 31 and p2_pos[1] > spa_pos[1] - 31 and p2_pos[1] < spa_pos[1] + 31: 
                     p2_score += 1
                     self.client_dict[spa] = {"position": [random.randint(10, WINDOW_WIDTH - 10), random.randint(-500, -20)]}
+                if spa_pos[1] > WINDOW_HEIGHT:
+                    self.client_dict[spa] = {"position": [random.randint(10, WINDOW_WIDTH - 10), random.randint(-500, -20)]}
             try:
                 self.client_dict['p1_score'] = p1_score
                 self.client_dict['p2_score'] = p2_score
