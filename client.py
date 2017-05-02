@@ -44,6 +44,7 @@ WINDOW_HEIGHT = 500;
 OFFSET = 60
 SPEED = 200
 color = (52, 152, 219)
+timeLeft = 60
 
 SPRITE_POS = '';
 keys = ''
@@ -52,7 +53,7 @@ it_count = 0
 
 act = ''
 connection = ''
-num_spaghetti = 10
+num_spaghetti = 100
 
 IDENTIFIER = 0
 
@@ -93,6 +94,7 @@ class Actions(ColorLayer):
 
     def __init__(self):
         super(Actions, self).__init__(52, 152, 219, 1000)
+        global depth
 
         self.sprite = Sprite('sub1.png')
         self.sprite.position = OFFSET, WINDOW_HEIGHT - OFFSET
@@ -111,14 +113,20 @@ class Actions(ColorLayer):
         self.sprite_vector[IDENTIFIER] = self.sprite
     
         self.sprite.do(MoveSubmarine())
-        
-        
+
+        #update color and write the time label
+        self.label = cocos.text.Label('Time Remaining: {} s'.format(timeLeft), font_name='Comic Sans', font_size=12, anchor_x='center', anchor_y='center')
+        self.label.position = WINDOW_WIDTH - 100, WINDOW_HEIGHT - 20
+        self.add(self.label)
+
+        self.colorLoop = LoopingCall(self.update_colortime)
+        self.colorLoop.start(1.0)
+
     def on_key_press(self, keyPress, modifiers):
         global SPEED
         global IDENTIFIER
         global connection
         global keys
-        self.update_color()
         
         if symbol_string(keyPress) == "D":
             new_pos = [self.sprite.position[0] + 10, self.sprite.position[1]]
@@ -141,9 +149,10 @@ class Actions(ColorLayer):
                 self.sprite.position = tuple(new_pos)
             self.ping()
     
-    def update_color(self):
+    def update_colortime(self):
         '''updates global variable for color and also self.color'''
-        global color
+        global color, timeLeft
+        print('UPDATING COLOR')
         r = color[0] - .333
         g = color[1] - 1
         b = color[2] 
@@ -155,6 +164,13 @@ class Actions(ColorLayer):
         if b > 255: b = 255
         color = (r, g, b)
         self.color = color
+        timeLeft -= 1
+        print('timeLeft:', timeLeft)
+        self.remove(self.label)
+        self.label = cocos.text.Label('Time Remaining: {} s'.format(timeLeft), font_name='Comic Sans', font_size=12, anchor_x='center', anchor_y='center')
+        self.label.position = WINDOW_WIDTH - 100, WINDOW_HEIGHT - 20
+        self.add(self.label)
+        print('DONE UPDATING COLORTIME')
             
 
     def echo(self):
