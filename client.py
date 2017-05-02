@@ -49,6 +49,7 @@ SPRITE_POS = '';
 keys = ''
 score = 0
 it_count = 0
+timeLeft = 10
 
 act = ''
 connection = ''
@@ -109,16 +110,19 @@ class Actions(ColorLayer):
         
         self.sprite_vector["client0"] = self.sprite
         self.sprite_vector["client1"] = self.sprite
-
         self.sprite.do(MoveSubmarine())
-        
-        
+        #create time and update color/time
+        self.label = cocos.text.Label('Time Remaining: {} s'.format(timeLeft), font_name='Comic Sans', font_size=12, anchor_x='center', anchor_y='center')
+        self.label.position = WINDOW_WIDTH - 100, WINDOW_HEIGHT - 20
+        self.add(self.label)
+        self.colorTimeLoop = LoopingCall(self.update_colortime)
+        self.colorTimeLoop.start(1.0)
+
     def on_key_press(self, keyPress, modifiers):
         global SPEED
         global IDENTIFIER
         global connection
         global keys
-        self.update_color()
         
         if symbol_string(keyPress) == "D":
             new_pos = [self.sprite.position[0] + 10, self.sprite.position[1]]
@@ -141,9 +145,10 @@ class Actions(ColorLayer):
                 self.sprite.position = tuple(new_pos)
             self.ping()
     
-    def update_color(self):
+    def update_colortime(self):
         '''updates global variable for color and also self.color'''
-        global color
+        print('UPDATING COLOR')
+        global color, timeLeft
         r = color[0] - .333
         g = color[1] - 1
         b = color[2] 
@@ -155,7 +160,13 @@ class Actions(ColorLayer):
         if b > 255: b = 255
         color = (r, g, b)
         self.color = color
-            
+        self.remove(self.label)
+        self.label = cocos.text.Label('Time Remaining: {} s'.format(timeLeft), font_name='Comic Sans', font_size=12, anchor_x='center', anchor_y='center')
+        self.label.position = WINDOW_WIDTH - 100, WINDOW_HEIGHT - 20
+        timeLeft -= 1
+        self.add(self.label)
+        print('DONE UPDATING COLOR')
+    
 
     def echo(self):
         print('Hello')

@@ -6,6 +6,7 @@
 from twisted.protocols import basic
 from twisted.internet.protocol import Protocol, Factory
 from twisted.internet import reactor
+import random
 
 from twisted.internet.task import LoopingCall
 
@@ -14,6 +15,8 @@ import json
 import time
 
 ### Protocol Implementation
+WINDOW_WIDTH = 700
+WINDOW_HEIGHT = 500
 
 identifier = 0
 FPS = 10.0
@@ -33,7 +36,7 @@ class ChatClient(basic.LineReceiver):
         self.lc.start(1.0 / FPS)
 
         for spa in spaghetti_names:
-            self.client_dict[spa] = {"position": [300, 300]}
+            self.client_dict[spa] = {"position": [random.randint(10, WINDOW_WIDTH - 10), random.randint(100, 200)]}
 
     def connectionMade(self):
         global identifier
