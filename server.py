@@ -18,6 +18,8 @@ import time
 identifier = 0
 FPS = 10.0
 
+client_names = ["client0", "client1"]
+
 class ChatClient(basic.LineReceiver):
     client_dict = {}
     #spaghetti0 spaghetti1 spaghetti2 ... spaghettiN in the dictionary
@@ -34,9 +36,9 @@ class ChatClient(basic.LineReceiver):
         self.factory.clients.append(self)
 
         if identifier < 2:
-            id_message = str(identifier)
+            id_message = client_names[identifier]
             self.message(id_message)
-            self.client_dict[identifier] = {"position": [100,100]}
+            self.client_dict[client_names[identifier]] = {"position": [100,100]}
             identifier += 1
 
         if identifier is 1:
@@ -48,8 +50,7 @@ class ChatClient(basic.LineReceiver):
 
     def lineReceived(self, line):
         json_receive = json.loads(line.rstrip())
-        self.client_dict[int(json_receive["ID"])] = {"position": json_receive["position"]}
-        #self.message(json.dumps(self.client_dict))
+        self.client_dict[json_receive["ID"]] = {"position": json_receive["position"]}
         print self.client_dict
 
     def send(self):

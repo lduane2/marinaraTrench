@@ -54,7 +54,7 @@ act = ''
 connection = ''
 num_spaghetti = 10
 
-IDENTIFIER = 0
+IDENTIFIER = ''
 
 class MoveSubmarine(Move):
     global SPRITE_POS
@@ -88,7 +88,7 @@ class MoveSpaghetti(Move):
 
 class Actions(ColorLayer):
     is_event_handler = True
-    sprite_vector = []
+    sprite_vector = {}
     sprite_data = {}
 
     def __init__(self):
@@ -105,11 +105,9 @@ class Actions(ColorLayer):
         self.seaweed.position = WINDOW_WIDTH / 2 - 15, 0
         self.add(self.seaweed)
         
-        self.sprite_vector.append(self.sprite)
-        self.sprite_vector.append(self.sprite)
+        self.sprite_vector["client0"] = self.sprite
+        self.sprite_vector["client1"] = self.sprite
 
-        self.sprite_vector[IDENTIFIER] = self.sprite
-    
         self.sprite.do(MoveSubmarine())
         
         
@@ -186,9 +184,9 @@ class Actions(ColorLayer):
         self.packet_dict = json.loads(packet)
         print(self.packet_dict)   
         for el in self.packet_dict:
-            if int(el) is not IDENTIFIER: 
-                #print(int(el))
-                self.sprite_vector[int(el)].position = tuple(self.packet_dict[el]['position'])
+            if el != IDENTIFIER and el in ["client0", "client1"]:
+                print(el)
+                self.sprite_vector[el].position = tuple(self.packet_dict[el]['position'])
 
     def ping(self):
         print("PING")
@@ -219,7 +217,7 @@ class MarinaraClient(basic.LineReceiver):
 
         if self.m_INIT:
             print("ID", str(data).rstrip())
-            IDENTIFIER = int(str(data).rstrip())
+            IDENTIFIER = str(data).rstrip()
 
             self.m_INIT = False
         else:
@@ -232,8 +230,8 @@ class MarinaraClient(basic.LineReceiver):
         packet_dict = json.loads(packet)
         if len(packet_dict) > self.num_clients:
             for el in packet_dict:
-                if int(el) is not IDENTIFIER:
-                    act.add_sprite(int(el))
+                if el != IDENTIFIER:
+                    act.add_sprite(el)
                     self.num_clients += 1
                     print("ADD", el)
                     print("ID ADD", IDENTIFIER)
