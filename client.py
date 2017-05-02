@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 
 # Copyright (c) Twisted Matrix Laboratories.
 # See LICENSE for details.
@@ -55,13 +56,13 @@ num_spaghetti = 10
 
 IDENTIFIER = 0
 
-class MoveGrossini(Move):
+class MoveSubmarine(Move):
     global SPRITE_POS
 
     def step(self, dt):
         global SPRITE_POS
 
-        super(MoveGrossini, self).step(dt)
+        super(MoveSubmarine, self).step(dt)
         SPRITE_POS = self.target.position
 
 class MoveSpaghetti(Move):
@@ -99,14 +100,17 @@ class Actions(ColorLayer):
         self.add(self.sprite)
         self.spaghetti = []
         self.make_spaghetti()
+        #making the seaweed
+        self.seaweed = Sprite('seaweed.png')
+        self.seaweed.position = WINDOW_WIDTH / 2 - 15, 0
+        self.add(self.seaweed)
         
         self.sprite_vector.append(self.sprite)
         self.sprite_vector.append(self.sprite)
 
         self.sprite_vector[IDENTIFIER] = self.sprite
     
-        self.sprite.do(MoveGrossini())
-        #set up key handling
+        self.sprite.do(MoveSubmarine())
         
         
     def on_key_press(self, keyPress, modifiers):
@@ -118,19 +122,23 @@ class Actions(ColorLayer):
         
         if symbol_string(keyPress) == "D":
             new_pos = [self.sprite.position[0] + 10, self.sprite.position[1]]
-            self.sprite.position = tuple(new_pos)
+            if new_pos[0] < WINDOW_WIDTH:
+                self.sprite.position = tuple(new_pos)
             self.ping()
         elif symbol_string(keyPress) == "A":
             new_pos = [self.sprite.position[0] - 10, self.sprite.position[1]]
-            self.sprite.position = tuple(new_pos)
+            if new_pos[0] > 0:
+                self.sprite.position = tuple(new_pos)
             self.ping()
         elif symbol_string(keyPress) == "S":
             new_pos = [self.sprite.position[0], self.sprite.position[1] - 10]
-            self.sprite.position = tuple(new_pos)
+            if new_pos[1] > 0:
+                self.sprite.position = tuple(new_pos)
             self.ping()
         elif symbol_string(keyPress) == "W":
             new_pos = [self.sprite.position[0], self.sprite.position[1] + 10]
-            self.sprite.position = tuple(new_pos)
+            if new_pos[1] < WINDOW_HEIGHT:
+                self.sprite.position = tuple(new_pos)
             self.ping()
     
     def update_color(self):
@@ -147,7 +155,6 @@ class Actions(ColorLayer):
         if b > 255: b = 255
         color = (r, g, b)
         self.color = color
-        print(score)
             
 
     def echo(self):

@@ -20,6 +20,8 @@ FPS = 10.0
 
 class ChatClient(basic.LineReceiver):
     client_dict = {}
+    #spaghetti0 spaghetti1 spaghetti2 ... spaghettiN in the dictionary
+    #
 
     def init(self):
         self.lc = LoopingCall(self.send)
