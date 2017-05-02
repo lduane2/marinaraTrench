@@ -56,6 +56,8 @@ num_spaghetti = 10
 
 IDENTIFIER = ''
 
+spaghetti_names = ["spaghetti0", "spaghetti1", "spaghetti2", "spaghetti3", "spaghetti4", "spaghetti5", "spaghetti6", "spaghetti7", "spaghetti8", "spaghetti9"]
+
 class MoveSubmarine(Move):
     global SPRITE_POS
 
@@ -75,11 +77,11 @@ class MoveSpaghetti(Move):
         if SPRITE_POS[0] > pos[0] - 10 and SPRITE_POS[0] < pos[0] + 10 and SPRITE_POS[1] > pos[1] - 10 and SPRITE_POS[1] < pos[1] + 10:
             print('COLLISION!')
             score = score + 1
-            self.target.position = random.randint(10, WINDOW_WIDTH - 10), random.randint(-500, -20)
+            #self.target.position = random.randint(10, WINDOW_WIDTH - 10), random.randint(-500, -20)
 
         #Off Screen Detection
-        if pos[1] >  WINDOW_HEIGHT:
-            self.target.position = random.randint(10, WINDOW_WIDTH - 10), -20
+        #if pos[1] >  WINDOW_HEIGHT:
+            #self.target.position = random.randint(10, WINDOW_WIDTH - 10), -20
         
         self.target.velocity = (1, 20)
         super(MoveSpaghetti, self).step(dt)
@@ -98,7 +100,7 @@ class Actions(ColorLayer):
         self.sprite.position = OFFSET, WINDOW_HEIGHT - OFFSET
         self.sprite.velocity = 0, 0
         self.add(self.sprite)
-        self.spaghetti = []
+        self.spaghetti = {}
         self.make_spaghetti()
         #making the seaweed
         self.seaweed = Sprite('seaweed.png')
@@ -159,15 +161,19 @@ class Actions(ColorLayer):
         print('Hello')
 
     def make_spaghetti(self):
+        global spaghetti_names
+
         print('\ntryna cook up some spaghetti\n')
-        for i in range(num_spaghetti):
+        for i in spaghetti_names:
+            print(self.spaghetti)
             random.seed()
             self.new_sprite = Sprite('spaghetti.png')
-            self.new_sprite.position = random.randint(10, WINDOW_WIDTH - 10), random.randint(-500, -20)
-            self.new_sprite.velocity = random.randint(-30, 30), random.randint(20, 40)
+            #self.new_sprite.position = random.randint(10, WINDOW_WIDTH - 10), random.randint(-500, -20)
+            self.new_sprite.position = -100, -100
+            #self.new_sprite.velocity = random.randint(-30, 30), random.randint(20, 40)
             self.new_sprite.do(MoveSpaghetti())
             self.add(self.new_sprite)
-            self.spaghetti.append(self.new_sprite)
+            self.spaghetti[i] = self.new_sprite
 
 
     def add_sprite(self, num):
@@ -177,17 +183,20 @@ class Actions(ColorLayer):
         self.sprite_vector[num] = sprite_add
 
     def increment_sprites(self, packet):
+        global spaghetti_names
         global IDENTIFIER
 
         print("ID", IDENTIFIER)
 
         self.packet_dict = json.loads(packet)
-        print(self.packet_dict)   
+        #print(self.packet_dict)   
         for el in self.packet_dict:
             if el != IDENTIFIER and el in ["client0", "client1"]:
                 print(el)
                 self.sprite_vector[el].position = tuple(self.packet_dict[el]['position'])
-
+            if el in spaghetti_names:
+                self.spaghetti[el].position = tuple(self.packet_dict[el]['position'])
+        
     def ping(self):
         print("PING")
         self.sprite_data["ID"] = IDENTIFIER
@@ -201,7 +210,7 @@ class MarinaraClient(basic.LineReceiver):
     global act
     global IDENTIFIER
     m_INIT = True
-    num_clients = 1;
+    num_clients = 11;
 
     """Once connected, send a message, then print the result."""
     def connectionMade(self):
@@ -230,7 +239,7 @@ class MarinaraClient(basic.LineReceiver):
         packet_dict = json.loads(packet)
         if len(packet_dict) > self.num_clients:
             for el in packet_dict:
-                if el != IDENTIFIER:
+                if el != IDENTIFIER and el in ["client0", "client1"]:
                     act.add_sprite(el)
                     self.num_clients += 1
                     print("ADD", el)

@@ -19,6 +19,7 @@ identifier = 0
 FPS = 10.0
 
 client_names = ["client0", "client1"]
+spaghetti_names = ["spaghetti0", "spaghetti1", "spaghetti2", "spaghetti3", "spaghetti4", "spaghetti5", "spaghetti6", "spaghetti7", "spaghetti8", "spaghetti9"] 
 
 class ChatClient(basic.LineReceiver):
     client_dict = {}
@@ -26,8 +27,13 @@ class ChatClient(basic.LineReceiver):
     #
 
     def init(self):
+        global spaghetti_names
+
         self.lc = LoopingCall(self.send)
         self.lc.start(1.0 / FPS)
+
+        for spa in spaghetti_names:
+            self.client_dict[spa] = {"position": [300, 300]}
 
     def connectionMade(self):
         global identifier
