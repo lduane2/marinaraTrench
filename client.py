@@ -71,27 +71,27 @@ class MoveSubmarine(Move):
 #	print ("sdfasdfasdfasdf")
         if keys[key.RIGHT]:
             print ("RIGHT")
-            new_pos = [self.target.position[0] + 10, self.target.position[1]]
+            new_pos = [self.target.position[0] + 3, self.target.position[1]]
             if new_pos[0] < WINDOW_WIDTH:
                 self.target.position = tuple(new_pos)
             self.ping()
 
         if keys[key.LEFT]:
             print ("LEFT")
-            new_pos = [self.target.position[0] - 10, self.target.position[1]]
-            if new_pos[0] < WINDOW_WIDTH:
+            new_pos = [self.target.position[0] - 3, self.target.position[1]]
+            if new_pos[0] > 0:
                 self.target.position = tuple(new_pos)
             self.ping()
 	if keys[key.UP]:
             print ("UP")
-            new_pos = [self.target.position[0], self.target.position[1]+10]
-            if new_pos[0] < WINDOW_WIDTH:
+            new_pos = [self.target.position[0], self.target.position[1] + 3]
+            if new_pos[1] < WINDOW_HEIGHT:
                 self.target.position = tuple(new_pos)	
             self.ping()
         if keys[key.DOWN]:
             print ("DOWN")
-            new_pos = [self.target.position[0], self.target.position[1]-10]
-            if new_pos[0] < WINDOW_WIDTH:
+            new_pos = [self.target.position[0], self.target.position[1] - 3]
+            if new_pos[1] > 0:
                 self.target.position = tuple(new_pos)
 	    self.ping()
 	#print (self.target.sprite_data)
@@ -185,37 +185,12 @@ class Actions(ColorLayer):
         global keys
 
         while keys[key.RIGHT]:
-
             print ("key is down")
             new_pos = [self.sprite.position[0] + 10, self.sprite.position[1]]
             if new_pos[0] < WINDOW_WIDTH:
                 self.sprite.position = tuple(new_pos)
             self.ping()
             break
-
-'''        
-        if symbol_string(keyPress) == "D":
-
-            new_pos = [self.sprite.position[0] + 10, self.sprite.position[1]]
-            if new_pos[0] < WINDOW_WIDTH:
-                self.sprite.position = tuple(new_pos)
-            self.ping()
-        elif symbol_string(keyPress) == "A":
-            new_pos = [self.sprite.position[0] - 10, self.sprite.position[1]]
-            if new_pos[0] > 0:
-                self.sprite.position = tuple(new_pos)
-            self.ping()
-        elif symbol_string(keyPress) == "S":
-            new_pos = [self.sprite.position[0], self.sprite.position[1] - 10]
-            if new_pos[1] > 0:
-                self.sprite.position = tuple(new_pos)
-            self.ping()
-        elif symbol_string(keyPress) == "W":
-            new_pos = [self.sprite.position[0], self.sprite.position[1] + 10]
-            if new_pos[1] < WINDOW_HEIGHT:
-                self.sprite.position = tuple(new_pos)
-            self.ping()
-         '''
 
     
     def update_client(self):
