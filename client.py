@@ -84,7 +84,7 @@ class MoveSpaghetti(Move):
         #if pos[1] >  WINDOW_HEIGHT:
             #self.target.position = random.randint(10, WINDOW_WIDTH - 10), -20
         
-        self.target.velocity = (1, 20)
+        self.target.velocity = (0, 0)
         super(MoveSpaghetti, self).step(dt)
 
 
@@ -112,7 +112,7 @@ class Actions(ColorLayer):
         self.sprite_vector["client1"] = self.sprite
         self.sprite.do(MoveSubmarine())
         #create time and update color/time
-        self.label = cocos.text.Label('Time Remaining: {} s'.format(timeLeft), font_name='Comic Sans', font_size=12, anchor_x='center', anchor_y='center')
+        self.label = cocos.text.Label('Time Remaining: {} s'.format(int(timeLeft)), font_name='Comic Sans', font_size=12, anchor_x='center', anchor_y='center')
         self.label.position = WINDOW_WIDTH - 100, WINDOW_HEIGHT - 20
         self.add(self.label)
         self.colorTimeLoop = LoopingCall(self.update_colortime)
@@ -161,9 +161,8 @@ class Actions(ColorLayer):
         color = (r, g, b)
         self.color = color
         self.remove(self.label)
-        self.label = cocos.text.Label('Time Remaining: {} s'.format(timeLeft), font_name='Comic Sans', font_size=12, anchor_x='center', anchor_y='center')
+        self.label = cocos.text.Label('Time Remaining: {} s'.format(int(timeLeft)), font_name='Comic Sans', font_size=12, anchor_x='center', anchor_y='center')
         self.label.position = WINDOW_WIDTH - 100, WINDOW_HEIGHT - 20
-        timeLeft -= 1
         self.add(self.label)
         print('DONE UPDATING COLOR')
     
@@ -196,10 +195,12 @@ class Actions(ColorLayer):
     def increment_sprites(self, packet):
         global spaghetti_names
         global IDENTIFIER
+        global timeLeft
 
         print("ID", IDENTIFIER)
 
         self.packet_dict = json.loads(packet)
+        timeLeft = self.packet_dict['time']
         #print(self.packet_dict)   
         for el in self.packet_dict:
             if el != IDENTIFIER and el in ["client0", "client1"]:

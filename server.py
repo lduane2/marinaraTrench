@@ -17,6 +17,7 @@ import time
 ### Protocol Implementation
 WINDOW_WIDTH = 700
 WINDOW_HEIGHT = 500
+timeLeft = 60
 
 identifier = 0
 FPS = 10.0
@@ -32,11 +33,13 @@ class ChatClient(basic.LineReceiver):
     def init(self):
         global spaghetti_names
 
+        for spa in spaghetti_names:
+            self.client_dict[spa] = {"position": [random.randint(10, WINDOW_WIDTH - 10), random.randint(-500, -20)]}
+
+        self.client_dict['time'] = timeLeft
+
         self.lc = LoopingCall(self.send)
         self.lc.start(1.0 / FPS)
-
-        for spa in spaghetti_names:
-            self.client_dict[spa] = {"position": [random.randint(10, WINDOW_WIDTH - 10), random.randint(100, 200)]}
 
     def connectionMade(self):
         global identifier
@@ -63,8 +66,14 @@ class ChatClient(basic.LineReceiver):
         print self.client_dict
 
     def send(self):
+        global timeLeft
+        for spa in spaghetti_names:
+            self.client_dict[spa] = {"position": [self.client_dict[spa]['position'][0] + .2, self.client_dict[spa]['position'][1] + 2]}
+        timeLeft = timeLeft - (FPS/ 100)
+        self.client_dict['time'] = timeLeft
         for c in self.factory.clients:
             c.message(json.dumps(self.client_dict))
+
 
     def message(self, message):
         self.transport.write(message + '\n')
