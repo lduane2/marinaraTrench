@@ -24,13 +24,15 @@ p2_score = 0
 identifier = 0
 FPS = 10.0
 
+PORT = 8000
+
 client_names = ["client0", "client1"]
 spaghetti_names = ["spaghetti0", "spaghetti1", "spaghetti2", "spaghetti3", "spaghetti4", "spaghetti5", "spaghetti6", "spaghetti7", "spaghetti8", "spaghetti9"] 
 
 class ChatClient(basic.LineReceiver):
     client_dict = {}
     #spaghetti0 spaghetti1 spaghetti2 ... spaghettiN in the dictionary
-    #
+    
 
     def init(self):
         global spaghetti_names
@@ -109,8 +111,8 @@ def main():
     f = Factory()
     f.protocol = ChatClient
     f.clients = []
-    print('Listening on 1025...')
-    reactor.listenTCP(1025, f)
+    print('Listening on 8000...')
+    reactor.listenTCP(8000, f)
     reactor.run()
 
 if __name__ == '__main__':

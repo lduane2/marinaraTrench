@@ -348,6 +348,10 @@ def main():
     global act
     global keys
 
+    if len(sys.argv) != 3:
+        print("usage: python client.py <server address> <port>")
+        exit(1)
+
     director.init(width=WINDOW_WIDTH, height=WINDOW_HEIGHT)
     keys = key.KeyStateHandler()
     cocos.director.director.window.push_handlers(keys)
@@ -362,7 +366,7 @@ def main():
     director._set_scene(main_scene)   
 
     f = EchoFactory()
-    reactor.connectTCP("localhost", 1025, f)
+    reactor.connectTCP(sys.argv[1], int(sys.argv[2]), f)
     reactor.run()
 
 # this only runs if the module was *not* imported
