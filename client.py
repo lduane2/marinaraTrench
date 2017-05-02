@@ -49,6 +49,9 @@ SPRITE_POS = '';
 keys = ''
 score = 0
 it_count = 0
+timeLeft = 60
+p1_score = 0
+p2_score = 0
 
 act = ''
 connection = ''
@@ -109,14 +112,15 @@ class MoveSpaghetti(Move):
     def step(self, dt):
         global SPRITE_POS
         global score
-	global keys
-        pos = self.target.position
+
         
         #Collision Detection
+        '''
         if SPRITE_POS[0] > pos[0] - 10 and SPRITE_POS[0] < pos[0] + 10 and SPRITE_POS[1] > pos[1] - 10 and SPRITE_POS[1] < pos[1] + 10:
             print('COLLISION!')
             score = score + 1
             #self.target.position = random.randint(10, WINDOW_WIDTH - 10), random.randint(-500, -20)
+        '''
 
         #Off Screen Detection
         #if pos[1] >  WINDOW_HEIGHT:
@@ -127,7 +131,7 @@ class MoveSpaghetti(Move):
 
 
         
-        self.target.velocity = (1, 20)
+        self.target.velocity = (0, 0)
         super(MoveSpaghetti, self).step(dt)
 
 
@@ -158,18 +162,28 @@ class Actions(ColorLayer):
         
         self.sprite_vector["client0"] = self.sprite
         self.sprite_vector["client1"] = self.sprite
-
         self.sprite.do(MoveSubmarine())
 
+        #create time and update color/time
+        self.label = cocos.text.Label('Time Remaining: {} s'.format(int(timeLeft)), font_name='Comic Sans', font_size=12, anchor_x='center', anchor_y='center')
+        self.label.position = WINDOW_WIDTH - 100, WINDOW_HEIGHT - 20
+        self.add(self.label)
 
- 
-       
+        #Score labels
+        self.scores = cocos.text.Label('P1: {}\tP2: {}'.format(p1_score, p2_score),font_name='Comic Sans', font_size=12, anchor_x='center', anchor_y='center')
+        self.scores.position = 50, WINDOW_HEIGHT - 20
+        self.add(self.scores)
+
+        self.updateLoop = LoopingCall(self.update_client)
+        self.updateLoop.start(1.0)
+
+
     def on_key_press(self, keyPress, modifiers):
         global SPEED
         global IDENTIFIER
         global connection
         global keys
-        self.update_color()
+
         while keys[key.RIGHT]:
 
             print ("key is down")
@@ -179,8 +193,9 @@ class Actions(ColorLayer):
             self.ping()
             break
 
-	'''        
-        elif symbol_string(keyPress) == "D":
+'''        
+        if symbol_string(keyPress) == "D":
+
             new_pos = [self.sprite.position[0] + 10, self.sprite.position[1]]
             if new_pos[0] < WINDOW_WIDTH:
                 self.sprite.position = tuple(new_pos)
@@ -200,12 +215,15 @@ class Actions(ColorLayer):
             if new_pos[1] < WINDOW_HEIGHT:
                 self.sprite.position = tuple(new_pos)
             self.ping()
-    	'''
-    def update_color(self):
-        '''updates global variable for color and also self.color'''
-        global color
-        r = color[0] - .333
-        g = color[1] - 1
+         '''
+
+    
+    def update_client(self):
+        '''updates global variables'''
+        global color, timeLeft, p1_score, p2_score
+        #updates color
+        r = color[0] - .666
+        g = color[1] - 2
         b = color[2] 
         if r < 0: r = 0
         if g < 0: g = 0
@@ -215,7 +233,17 @@ class Actions(ColorLayer):
         if b > 255: b = 255
         color = (r, g, b)
         self.color = color
-            
+        #updates time remaingin
+        self.remove(self.label)
+        self.label = cocos.text.Label('Time Remaining: {} s'.format(int(timeLeft)), font_name='Comic Sans', font_size=12, anchor_x='center', anchor_y='center')
+        self.label.position = WINDOW_WIDTH - 100, WINDOW_HEIGHT - 20
+        self.add(self.label)
+        #updates scores
+        self.remove(self.scores)
+        self.scores = cocos.text.Label('P1: {}\tP2: {}'.format(p1_score, p2_score),font_name='Comic Sans', font_size=12, anchor_x='center', anchor_y='center')
+        self.scores.position = 50, WINDOW_HEIGHT - 20
+        self.add(self.scores)
+    
 
     def echo(self):
         print('Hello')
@@ -238,17 +266,23 @@ class Actions(ColorLayer):
 
     def add_sprite(self, num):
         sprite_add = Sprite('sub2.png')
-        sprite_add.position = 100, 100
+        sprite_add.position = -100, -100
         self.add(sprite_add)
         self.sprite_vector[num] = sprite_add
 
     def increment_sprites(self, packet):
         global spaghetti_names
         global IDENTIFIER
+        global timeLeft
+        global p1_score, p2_score
 
         print("ID", IDENTIFIER)
 
         self.packet_dict = json.loads(packet)
+        timeLeft = self.packet_dict['time']
+        p1_score = self.packet_dict['p1_score']
+        p2_score = self.packet_dict['p2_score']
+        
         #print(self.packet_dict)   
         for el in self.packet_dict:
             if el != IDENTIFIER and el in ["client0", "client1"]:
