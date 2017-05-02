@@ -61,16 +61,55 @@ spaghetti_names = ["spaghetti0", "spaghetti1", "spaghetti2", "spaghetti3", "spag
 class MoveSubmarine(Move):
     global SPRITE_POS
 
+    sprite_data = {}
     def step(self, dt):
         global SPRITE_POS
+        global connection
+#	print ("sdfasdfasdfasdf")
+        if keys[key.RIGHT]:
+            print ("RIGHT")
+            new_pos = [self.target.position[0] + 10, self.target.position[1]]
+            if new_pos[0] < WINDOW_WIDTH:
+                self.target.position = tuple(new_pos)
+            self.ping()
+
+        if keys[key.LEFT]:
+            print ("LEFT")
+            new_pos = [self.target.position[0] - 10, self.target.position[1]]
+            if new_pos[0] < WINDOW_WIDTH:
+                self.target.position = tuple(new_pos)
+            self.ping()
+	if keys[key.UP]:
+            print ("UP")
+            new_pos = [self.target.position[0], self.target.position[1]+10]
+            if new_pos[0] < WINDOW_WIDTH:
+                self.target.position = tuple(new_pos)	
+            self.ping()
+        if keys[key.DOWN]:
+            print ("DOWN")
+            new_pos = [self.target.position[0], self.target.position[1]-10]
+            if new_pos[0] < WINDOW_WIDTH:
+                self.target.position = tuple(new_pos)
+	    self.ping()
+	#print (self.target.sprite_data)
+
 
         super(MoveSubmarine, self).step(dt)
         SPRITE_POS = self.target.position
 
+    def ping(self):
+	print ("PINPG")
+        global connection
+        self.sprite_data["ID"] = IDENTIFIER
+        self.sprite_data["position"] = self.target.position
+        print(json.dumps(self.sprite_data))
+        connection.transport.write(json.dumps(self.sprite_data) + '\n')
+        
 class MoveSpaghetti(Move):
     def step(self, dt):
         global SPRITE_POS
         global score
+	global keys
         pos = self.target.position
         
         #Collision Detection
@@ -82,6 +121,11 @@ class MoveSpaghetti(Move):
         #Off Screen Detection
         #if pos[1] >  WINDOW_HEIGHT:
             #self.target.position = random.randint(10, WINDOW_WIDTH - 10), -20
+
+
+
+
+
         
         self.target.velocity = (1, 20)
         super(MoveSpaghetti, self).step(dt)
@@ -93,9 +137,14 @@ class Actions(ColorLayer):
     sprite_vector = {}
     sprite_data = {}
 
+    def step(self, dt):
+	print ("pease")
+
     def __init__(self):
         super(Actions, self).__init__(52, 152, 219, 1000)
 
+	beatlesMusic = pyglet.media.load('yelloSub.wav', streaming=False)
+	beatlesMusic.play()
         self.sprite = Sprite('sub1.png')
         self.sprite.position = OFFSET, WINDOW_HEIGHT - OFFSET
         self.sprite.velocity = 0, 0
@@ -111,16 +160,27 @@ class Actions(ColorLayer):
         self.sprite_vector["client1"] = self.sprite
 
         self.sprite.do(MoveSubmarine())
-        
-        
+
+
+ 
+       
     def on_key_press(self, keyPress, modifiers):
         global SPEED
         global IDENTIFIER
         global connection
         global keys
         self.update_color()
-        
-        if symbol_string(keyPress) == "D":
+        while keys[key.RIGHT]:
+
+            print ("key is down")
+            new_pos = [self.sprite.position[0] + 10, self.sprite.position[1]]
+            if new_pos[0] < WINDOW_WIDTH:
+                self.sprite.position = tuple(new_pos)
+            self.ping()
+            break
+
+	'''        
+        elif symbol_string(keyPress) == "D":
             new_pos = [self.sprite.position[0] + 10, self.sprite.position[1]]
             if new_pos[0] < WINDOW_WIDTH:
                 self.sprite.position = tuple(new_pos)
@@ -140,7 +200,7 @@ class Actions(ColorLayer):
             if new_pos[1] < WINDOW_HEIGHT:
                 self.sprite.position = tuple(new_pos)
             self.ping()
-    
+    	'''
     def update_color(self):
         '''updates global variable for color and also self.color'''
         global color
