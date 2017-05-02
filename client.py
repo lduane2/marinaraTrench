@@ -185,15 +185,6 @@ class Actions(ColorLayer):
         self.scores.position = 50, WINDOW_HEIGHT - 20
         self.add(self.scores)
 
-        #player labels
-        self.p1_label = cocos.text.Label('P1', font_name='Comic Sans', font_size=10)
-        self.p1_label.position = SPRITE_POS[0], SPRITE_POS[1] + 100
-        self.add(self.p1_label)
-
-        self.p2_label = cocos.text.Label('P2', font_name='Comic Sans', font_size=10)
-        self.p2_label.position = SPRITE_POS[0], SPRITE_POS[1] + 100
-        self.add(self.p2_label)
-
         self.updateLoop = LoopingCall(self.update_client)
         self.updateLoop.start(1.0)
 
