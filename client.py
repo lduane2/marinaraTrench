@@ -337,6 +337,10 @@ def main():
     global act
     global keys
 
+    if len(sys.argv) != 3:
+        print("usage: python client.py <server address> <port>")
+        exit(1)
+
     director.init(width=WINDOW_WIDTH, height=WINDOW_HEIGHT)
     keys = key.KeyStateHandler()
     cocos.director.director.window.push_handlers(keys)

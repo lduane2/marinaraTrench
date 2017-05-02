@@ -32,7 +32,7 @@ spaghetti_names = ["spaghetti0", "spaghetti1", "spaghetti2", "spaghetti3", "spag
 class ChatClient(basic.LineReceiver):
     client_dict = {}
     #spaghetti0 spaghetti1 spaghetti2 ... spaghettiN in the dictionary
-    #
+    
 
     def init(self):
         global spaghetti_names
