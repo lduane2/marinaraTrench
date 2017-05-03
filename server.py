@@ -24,13 +24,15 @@ p2_score = 0
 identifier = 0
 FPS = 10.0
 
+PORT = 8000
+
 client_names = ["client0", "client1"]
 spaghetti_names = ["spaghetti0", "spaghetti1", "spaghetti2", "spaghetti3", "spaghetti4", "spaghetti5", "spaghetti6", "spaghetti7", "spaghetti8", "spaghetti9"] 
 
 class ChatClient(basic.LineReceiver):
     client_dict = {}
     #spaghetti0 spaghetti1 spaghetti2 ... spaghettiN in the dictionary
-    #
+    
 
     def init(self):
         global spaghetti_names
@@ -83,6 +85,8 @@ class ChatClient(basic.LineReceiver):
                 if p2_pos[0] > spa_pos[0] - 31 and p2_pos[0] < spa_pos[0] + 31 and p2_pos[1] > spa_pos[1] - 31 and p2_pos[1] < spa_pos[1] + 31: 
                     p2_score += 1
                     self.client_dict[spa] = {"position": [random.randint(10, WINDOW_WIDTH - 10), random.randint(-500, -20)]}
+                if spa_pos[1] > WINDOW_HEIGHT:
+                    self.client_dict[spa] = {"position": [random.randint(10, WINDOW_WIDTH - 10), random.randint(-500, -20)]}
             try:
                 self.client_dict['p1_score'] = p1_score
                 self.client_dict['p2_score'] = p2_score
@@ -107,8 +111,8 @@ def main():
     f = Factory()
     f.protocol = ChatClient
     f.clients = []
-    print('Listening on 1025...')
-    reactor.listenTCP(1025, f)
+    print('Listening on 8000...')
+    reactor.listenTCP(8000, f)
     reactor.run()
 
 if __name__ == '__main__':

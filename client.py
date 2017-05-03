@@ -85,26 +85,37 @@ class MoveSubmarine(Move):
             new_pos = [self.target.position[0] + 3, self.target.position[1]]
             if new_pos[0] < WINDOW_WIDTH:
                 self.target.position = tuple(new_pos)
-            self.ping()
-
+            try:
+                self.ping()
+            except:
+                pass
         if keys[key.LEFT]:
             print ("LEFT")
             new_pos = [self.target.position[0] - 3, self.target.position[1]]
             if new_pos[0] > 0:
                 self.target.position = tuple(new_pos)
-            self.ping()
+            try:
+                self.ping()
+            except:
+                pass
 	if keys[key.UP]:
             print ("UP")
             new_pos = [self.target.position[0], self.target.position[1] + 3]
             if new_pos[1] < WINDOW_HEIGHT:
                 self.target.position = tuple(new_pos)	
-            self.ping()
+            try:
+                self.ping()
+            except:
+                pass
         if keys[key.DOWN]:
             print ("DOWN")
             new_pos = [self.target.position[0], self.target.position[1] - 3]
             if new_pos[1] > 0:
                 self.target.position = tuple(new_pos)
-	    self.ping()
+            try:
+	        self.ping()
+            except:
+                pass
 	#print (self.target.sprite_data)
 
 
@@ -191,7 +202,7 @@ class Actions(ColorLayer):
         self.add(self.label)
 
         #Score labels
-        self.scores = cocos.text.Label('P1: {}\tP2: {}'.format(p1_score, p2_score),font_name='Comic Sans', font_size=12, anchor_x='center', anchor_y='center')
+        self.scores = cocos.text.Label('P1: {}    P2: {}'.format(p1_score, p2_score),font_name='Comic Sans', font_size=12, anchor_x='center', anchor_y='center')
         self.scores.position = 50, WINDOW_HEIGHT - 20
         self.add(self.scores)
 
@@ -429,6 +440,9 @@ class endLayer(ColorLayer):
 def main():
     global act
     global keys
+    if len(sys.argv) != 3:
+        print("usage: python client.py <server address> <port>")
+        exit(1)
     director.init(width=WINDOW_WIDTH, height=WINDOW_HEIGHT)
     keys = key.KeyStateHandler()
     cocos.director.director.window.push_handlers(keys)
@@ -443,7 +457,7 @@ def main():
     director._set_scene(main_scene)   
 
     f = EchoFactory()
-    reactor.connectTCP("localhost", 1025, f)
+    reactor.connectTCP(sys.argv[1], int(sys.argv[2]), f)
     reactor.run()
 
 # this only runs if the module was *not* imported
