@@ -26,6 +26,9 @@ from cocos import layer
 from cocos.sprite import Sprite
 from cocos.actions import *
 from cocos.director import director
+from cocos.scenes import FadeTransition
+from cocos.text import Label
+
 
 from pyglet.window import key
 from pyglet.window.key import symbol_string
@@ -33,6 +36,9 @@ from pyglet.window.key import symbol_string
 from twisted.protocols import basic
 from twisted.internet import reactor, protocol
 from twisted.internet.task import LoopingCall
+
+
+
 
 from time import sleep
 import math
@@ -52,6 +58,11 @@ it_count = 0
 timeLeft = 60
 p1_score = 0
 p2_score = 0
+
+
+transition = False
+
+
 
 act = ''
 connection = ''
@@ -105,8 +116,16 @@ class MoveSubmarine(Move):
         global connection
         self.sprite_data["ID"] = IDENTIFIER
         self.sprite_data["position"] = self.target.position
-        print(json.dumps(self.sprite_data))
+        #print(json.dumps(self.sprite_data))
         connection.transport.write(json.dumps(self.sprite_data) + '\n')
+
+class MoveBubbles(Move):
+    def step(self, dt):
+        if self.target.position[1] > WINDOW_HEIGHT:
+            self.target.position = random.randint(10, WINDOW_WIDTH -1), -20
+        self.target.velocity = (1 , 20 )
+        super(MoveBubbles, self).step(dt)
+
         
 class MoveSpaghetti(Move):
     def step(self, dt):
@@ -155,6 +174,8 @@ class Actions(ColorLayer):
         self.add(self.sprite)
         self.spaghetti = {}
         self.make_spaghetti()
+        self.bubbles = {}
+        self.make_bubbles()
         #making the seaweed
         self.seaweed = Sprite('seaweed.png')
         self.seaweed.position = WINDOW_WIDTH / 2 - 15, 0
@@ -238,6 +259,17 @@ class Actions(ColorLayer):
             self.add(self.new_sprite)
             self.spaghetti[i] = self.new_sprite
 
+    def make_bubbles(self):
+	bubbleCount = 10
+        for i in range(bubbleCount):
+            random.seed()
+            self.new_sprite = Sprite('bubb.png')
+            self.new_sprite.position = random.randint(10, WINDOW_WIDTH - 10), random.randint(-500, -20)
+            #self.new_sprite.position = -100, -100
+            self.new_sprite.velocity = random.randint(-30, 30), 1
+            self.new_sprite.do(MoveBubbles())
+            self.add(self.new_sprite)
+            self.bubbles[i] = self.new_sprite
 
     def add_sprite(self, num):
         sprite_add = Sprite('sub2.png')
@@ -246,22 +278,32 @@ class Actions(ColorLayer):
         self.sprite_vector[num] = sprite_add
 
     def increment_sprites(self, packet):
+        global transition
         global spaghetti_names
         global IDENTIFIER
         global timeLeft
         global p1_score, p2_score
 
-        print("ID", IDENTIFIER)
+        #print("ID", IDENTIFIER)
 
         self.packet_dict = json.loads(packet)
         timeLeft = self.packet_dict['time']
         p1_score = self.packet_dict['p1_score']
         p2_score = self.packet_dict['p2_score']
-        
+        if int(timeLeft) == 0 and not transition:
+            print ("Negative")
+            transition = True
+            timeLeft = -1            
+            #self.updateLoop.stop()
+            director.replace(FadeTransition(Scene(endLayer())))
+            #reactor.stop()
+        if int(timeLeft) < 0:
+            return        
+#self.updateLoop.end()
         #print(self.packet_dict)   
         for el in self.packet_dict:
             if el != IDENTIFIER and el in ["client0", "client1"]:
-                print(el)
+                #print(el)
                 self.sprite_vector[el].position = tuple(self.packet_dict[el]['position'])
             if el in spaghetti_names:
                 self.spaghetti[el].position = tuple(self.packet_dict[el]['position'])
@@ -270,7 +312,7 @@ class Actions(ColorLayer):
         print("PING")
         self.sprite_data["ID"] = IDENTIFIER
         self.sprite_data["position"] = self.sprite.position
-        print(json.dumps(self.sprite_data))
+        #print(json.dumps(self.sprite_data))
         connection.transport.write(json.dumps(self.sprite_data) + '\n')
 
 
@@ -294,7 +336,7 @@ class MarinaraClient(basic.LineReceiver):
         global IDENTIFIER
 
         if self.m_INIT:
-            print("ID", str(data).rstrip())
+            #print("ID", str(data).rstrip())
             IDENTIFIER = str(data).rstrip()
 
             self.m_INIT = False
@@ -311,8 +353,8 @@ class MarinaraClient(basic.LineReceiver):
                 if el != IDENTIFIER and el in ["client0", "client1"]:
                     act.add_sprite(el)
                     self.num_clients += 1
-                    print("ADD", el)
-                    print("ID ADD", IDENTIFIER)
+                    #print("ADD", el)
+                    #print("ID ADD", IDENTIFIER)
         else:
             act.increment_sprites(packet)
 
@@ -329,14 +371,64 @@ class EchoFactory(protocol.ClientFactory):
     
     def clientConnectionLost(self, connector, reason):
         print("Connection lost - goodbye!")
+
+
         reactor.stop()
+
+
+class endLayer(ColorLayer):
+    is_event_handler =True
+    
+    def __init__(self):
+        global p2_score
+        global p1_score
+        super(endLayer, self).__init__(52, 152, 219, 1000)    
+        #text = Label("You Won!")
+        print (IDENTIFIER)
+        score = 0        
+        opScore = -1
+        if IDENTIFIER == "client1":
+            score = p2_score
+            opScore = p1_score
+	else:
+            score = p1_score
+	    opScore = p2_score
+        message = "You Lost.  Try Again Next Time!"
+        if score > opScore:
+            message = "You Won, Congrats!"
+        
+        
+        print ("we did it patrick, we saved the city")
+        text = Label(message)
+	text2 = Label("Your Score: " +str(score) + " Opponent Score: " + str(opScore) )
+
+        '''
+        print ("here is the ident |" + IDENTIFIER + "| sdfsd")
+        if IDENTIFIER == "client1":
+            print ("reeeeeeeee")
+	elif IDENTIFIER == "client0":
+            print ("nintendo switch")
+	else:
+            print ("vlient")
+            print (IDENTIFIER)
+	print (IDENTIFIER)
+	#textTwo = Label("Your Score was " +str(
+        '''
+        text2.position = director._window_virtual_width / 4, (director._window_virtual_height / 2) -30
+
+        text.position = director._window_virtual_width / 4, director._window_virtual_height / 2
+
+        self.add(text)
+        self.add(text2)
+
+
+
 
 
 # this connects the protocol to a server runing on port 8000
 def main():
     global act
     global keys
-
     director.init(width=WINDOW_WIDTH, height=WINDOW_HEIGHT)
     keys = key.KeyStateHandler()
     cocos.director.director.window.push_handlers(keys)
