@@ -79,9 +79,8 @@ class MoveSubmarine(Move):
     def step(self, dt):
         global SPRITE_POS
         global connection
-#	print ("sdfasdfasdfasdf")
         if keys[key.RIGHT]:
-            print ("RIGHT")
+            #print ("RIGHT")
             new_pos = [self.target.position[0] + 3, self.target.position[1]]
             if new_pos[0] < WINDOW_WIDTH:
                 self.target.position = tuple(new_pos)
@@ -90,7 +89,7 @@ class MoveSubmarine(Move):
             except:
                 pass
         if keys[key.LEFT]:
-            print ("LEFT")
+            #print ("LEFT")
             new_pos = [self.target.position[0] - 3, self.target.position[1]]
             if new_pos[0] > 0:
                 self.target.position = tuple(new_pos)
@@ -99,7 +98,7 @@ class MoveSubmarine(Move):
             except:
                 pass
 	if keys[key.UP]:
-            print ("UP")
+            #print ("UP")
             new_pos = [self.target.position[0], self.target.position[1] + 3]
             if new_pos[1] < WINDOW_HEIGHT:
                 self.target.position = tuple(new_pos)	
@@ -108,7 +107,7 @@ class MoveSubmarine(Move):
             except:
                 pass
         if keys[key.DOWN]:
-            print ("DOWN")
+            #print ("DOWN")
             new_pos = [self.target.position[0], self.target.position[1] - 3]
             if new_pos[1] > 0:
                 self.target.position = tuple(new_pos)
@@ -258,9 +257,9 @@ class Actions(ColorLayer):
     def make_spaghetti(self):
         global spaghetti_names
 
-        print('\ntryna cook up some spaghetti\n')
+        #print('\ntryna cook up some spaghetti\n')
         for i in spaghetti_names:
-            print(self.spaghetti)
+            #print(self.spaghetti)
             random.seed()
             self.new_sprite = Sprite('spaghetti.png')
             #self.new_sprite.position = random.randint(10, WINDOW_WIDTH - 10), random.randint(-500, -20)
@@ -302,7 +301,7 @@ class Actions(ColorLayer):
         p1_score = self.packet_dict['p1_score']
         p2_score = self.packet_dict['p2_score']
         if int(timeLeft) == 0 and not transition:
-            print ("Negative")
+            #print ("Negative")
             transition = True
             timeLeft = -1            
             #self.updateLoop.stop()
@@ -320,7 +319,7 @@ class Actions(ColorLayer):
                 self.spaghetti[el].position = tuple(self.packet_dict[el]['position'])
         
     def ping(self):
-        print("PING")
+        #print("PING")
         self.sprite_data["ID"] = IDENTIFIER
         self.sprite_data["position"] = self.sprite.position
         #print(json.dumps(self.sprite_data))
@@ -409,22 +408,10 @@ class endLayer(ColorLayer):
             message = "You Won, Congrats!"
         
         
-        print ("we did it patrick, we saved the city")
+        #print ("we did it patrick, we saved the city")
         text = Label(message)
 	text2 = Label("Your Score: " +str(score) + " Opponent Score: " + str(opScore) )
 
-        '''
-        print ("here is the ident |" + IDENTIFIER + "| sdfsd")
-        if IDENTIFIER == "client1":
-            print ("reeeeeeeee")
-	elif IDENTIFIER == "client0":
-            print ("nintendo switch")
-	else:
-            print ("vlient")
-            print (IDENTIFIER)
-	print (IDENTIFIER)
-	#textTwo = Label("Your Score was " +str(
-        '''
         text2.position = director._window_virtual_width / 4, (director._window_virtual_height / 2) -30
 
         text.position = director._window_virtual_width / 4, director._window_virtual_height / 2
