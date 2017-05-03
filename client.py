@@ -338,7 +338,10 @@ class Actions(ColorLayer):  # represents the actions taht can take place on the 
         self.sprite_data["ID"] = IDENTIFIER  # send which player you are
         self.sprite_data["position"] = self.sprite.position  # send your position
         #print(json.dumps(self.sprite_data))
-        connection.transport.write(json.dumps(self.sprite_data) + '\n') # send it across the web
+        try:
+            connection.transport.write(json.dumps(self.sprite_data) + '\n') # send it across the web
+        except:
+            pass
 
 
 # a client protocol
